@@ -1,59 +1,321 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PharmaPortal
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/pharmaportal.png" alt="PharmaPortal Logo" width="180">
 </p>
 
-## About Laravel
+<p align="center">
+  <strong>Pharmacy Availability & Inventory Management Platform</strong><br>
+  Find medications, reserve them online, and manage pharmacy stock from a single platform.
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## About PharmaPortal
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+PharmaPortal is a Laravel web application built for the Algerian pharmacy market. It connects clients looking for medications with nearby pharmacies, while giving pharmacy owners and sellers the tools to manage inventory, stock levels, expiration dates, reservations, and sales.
 
-## Learning Laravel
+The platform has four user roles:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Role | Purpose |
+| --- | --- |
+| **Administrator** | Creates and manages pharmacies and their owner accounts |
+| **Owner** | Manages the pharmacy inventory, sellers, reservations, and sales |
+| **Seller** | Handles point-of-sale operations, stock decrements, and reservation pickup |
+| **Client** | Searches products, finds nearby pharmacies, and reserves medications |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Main features
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- Multi-role authentication with role-protected dashboards
+- Pharmacy management with geolocation coordinates
+- Inventory management with stock, price, expiration date, and visibility control
+- Public and private products (private items are hidden from clients)
+- Product search with relevance scoring and autocomplete suggestions
+- "Near Me" pharmacy discovery using the Haversine distance formula
+- Reservation system with a unique 6-digit pickup code
+- Automatic reservation expiry after 24 hours with stock restoration
+- Seller POS stock decrements and reservation claim verification
+- Sales history for owners and sellers
+- Low-stock, expiring-soon, and expired product alerts
+- Email OTP verification for client accounts
 
-## Agentic Development
+### Technologies
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+- **Backend:** Laravel 13, PHP 8.3+
+- **Database:** MongoDB (via `mongodb/laravel-mongodb`)
+- **Frontend:** Blade templates, Tailwind CSS, Vite
+- **Authentication:** Laravel multi-guard authentication and custom role middleware
+- **Scheduling:** Laravel scheduler and Artisan commands
+- **Mail:** Laravel Mail with Mailable classes
+
+---
+
+## Requirements
+
+Make sure the following are installed before running the project:
+
+- PHP 8.3 or newer
+- Composer
+- Node.js and npm
+- MongoDB running locally on `127.0.0.1:27017`
+- PHP MongoDB extension (`ext-mongodb`)
+
+Check the PHP extension with:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php -m | grep mongodb
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Run the Application
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Install PHP dependencies
 
-## Code of Conduct
+```bash
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 2. Create the environment file
 
-## Security Vulnerabilities
+```bash
+cp .env.example .env
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Open `.env` and configure the application and MongoDB connection:
 
-## License
+```env
+APP_NAME=PharmaPortal
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# pharmacy-app2
+DB_CONNECTION=mongodb
+DB_HOST=127.0.0.1
+DB_PORT=27017
+DB_DATABASE=pharmacy_management
+DB_USERNAME=
+DB_PASSWORD=
+
+SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
+
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="hello@pharmaportal.dz"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+Notes:
+
+- The application stores its data in MongoDB, so `DB_CONNECTION` must be `mongodb`.
+- `SESSION_DRIVER`, `CACHE_STORE`, and `QUEUE_CONNECTION` are set to local drivers so the application can run without additional database tables.
+- With `MAIL_MAILER=log`, verification OTP codes are written to `storage/logs/laravel.log`. Configure SMTP credentials instead if you want real emails.
+
+### 3. Generate the application key
+
+```bash
+php artisan key:generate
+```
+
+### 4. Install and build frontend assets
+
+```bash
+npm install
+npm run build
+```
+
+For development with hot reloading, use `npm run dev` in a separate terminal instead of `npm run build`.
+
+### 5. Start MongoDB
+
+Make sure the MongoDB service is running:
+
+```bash
+sudo systemctl start mongod
+```
+
+Or start it manually with your preferred MongoDB setup. The default connection expects `127.0.0.1:27017`.
+
+### 6. Start the Laravel development server
+
+```bash
+php artisan serve
+```
+
+Open the application at:
+
+```text
+http://127.0.0.1:8000
+```
+
+### 7. Create the first administrator
+
+On a fresh database there is no administrator account yet. Create one with Tinker:
+
+```bash
+php artisan tinker
+```
+
+```php
+\App\Models\Admin::create([
+    'nom' => 'System',
+    'prenom' => 'Administrator',
+    'email' => 'admin@pharmaportal.dz',
+    'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+    'num_tel' => '0550000000',
+]);
+```
+
+Then log in at:
+
+```text
+http://127.0.0.1:8000/admin/login
+```
+
+Use `admin@pharmaportal.dz` / `admin123`. Change these credentials after the first login in a real deployment.
+
+---
+
+## First-Time Setup Flow
+
+1. Log in as the administrator at `/admin/login`.
+2. Create a pharmacy from the admin dashboard. The administrator form also creates the pharmacy owner account.
+3. Log in as the owner at `/owner-login` and add products, or seed demo inventory.
+4. Create seller accounts from the owner's **Sellers** page.
+5. Log in as a seller at `/seller-login` to process sales and validate reservations.
+6. Clients can register at `/client-register`, verify their email, and browse products.
+
+The guest catalog is available at:
+
+```text
+http://127.0.0.1:8000/guest-products
+```
+
+---
+
+## Optional Demo Data
+
+### Seed realistic inventory
+
+After at least one pharmacy exists:
+
+```bash
+php artisan db:seed-inventory
+```
+
+This creates 10 to 20 realistic medication products per pharmacy.
+
+To append more products instead of replacing existing ones:
+
+```bash
+php artisan db:seed-additional-products
+```
+
+### Seed test users and products
+
+```bash
+php artisan db:seed --class=PharmacyTestSeeder
+```
+
+Test accounts created by this seeder:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Owner | `owner1@pharmacy.dz` | `password123` |
+| Owner | `owner2@pharmacy.dz` | `password123` |
+| Seller | `seller1@pharmacy.dz` | `password123` |
+| Seller | `seller2@pharmacy.dz` | `password123` |
+| Seller | `seller3@pharmacy.dz` | `password123` |
+| Client | `patient@test.dz` | `password123` |
+
+---
+
+## Automatic Reservation Expiry
+
+Pending reservations expire 24 hours after creation and their stock is restored automatically. The expiry command is scheduled every minute in `routes/console.php`:
+
+```php
+Schedule::command('reservations:expire')->everyMinute();
+```
+
+To run the scheduler locally, start it in a separate terminal:
+
+```bash
+php artisan schedule:work
+```
+
+You can also run the expiry command manually:
+
+```bash
+php artisan reservations:expire
+```
+
+---
+
+## Main Routes
+
+| Route | Description |
+| --- | --- |
+| `/guest-products` | Public product catalog |
+| `/client-register` | Client registration |
+| `/client-verify` | Email OTP verification |
+| `/client-login` | Login for clients, owners, and sellers |
+| `/client-dashboard` | Client product search |
+| `/client-nearme` | Pharmacies near the client |
+| `/client-orders` | Client reservations |
+| `/owner-login` | Owner login |
+| `/owner/inventory` | Owner inventory management |
+| `/owner/reservations` | Owner reservation list |
+| `/owner/sellers` | Owner seller management |
+| `/owner/sales` | Owner sales history |
+| `/seller-login` | Seller login |
+| `/seller/inventory` | Seller point of sale |
+| `/seller/reservations` | Seller reservation validation |
+| `/seller/sales` | Seller sales history |
+| `/admin/login` | Administrator login |
+| `/admin/dashboard` | Pharmacy management |
+
+---
+
+## Project Structure
+
+```text
+app/
+  Console/Commands/       Reservation expiry and inventory seeding commands
+  Http/Controllers/       Application controllers
+  Http/Middleware/        Role-based access middleware
+  Mail/                   Verification email classes
+  Models/                 MongoDB models (Admin, User, Pharmacy, Product, Reservation, Sale)
+  Services/               Product search and verification services
+resources/views/
+  admin/                  Administrator views
+  client/                 Client views
+  dashboard/owner/        Owner dashboard views
+  dashboard/seller/       Seller dashboard views
+  guest/                  Public catalog views
+  emails/                 Email templates
+routes/
+  web.php                 Web routes and role-protected route groups
+  api.php                 Public API routes
+  console.php             Scheduled commands
+public/images/
+  pharmaportal.png        PharmaPortal logo
+```
+
+---
+
+## Testing
+
+Run the test suite with:
+
+```bash
+php artisan test
+```
+
+or:
+
+```bash
+composer test
+```
