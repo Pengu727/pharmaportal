@@ -18,42 +18,53 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        // 1. Get the authenticated user's role from any guard
         $userRole = null;
-        
-        // Check all available guards
-        $guards = ['web', 'admin'];
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                $userRole = Auth::guard($guard)->user()->role ?? null;
-                if ($userRole) break;
-            }
+
+        // Check admin guard first (separate auth model)
+        if (in_array('admin', $roles) && Auth::guard('admin')->check()) {
+            // Admin model has a getRoleAttribute() accessor returning 'admin'
+            $userRole = 'admin';
         }
-        
-        // Fallback: Check request->user() (default guard)
+
+        // Check web guard for regular users (owner, seller, client)
+        if (!$userRole && Auth::guard('web')->check()) {
+            $userRole = Auth::guard('web')->user()->role ?? null;
+        }
+
+        // Fallback: Check default request user
         if (!$userRole && $request->user()) {
             $userRole = $request->user()->role ?? null;
         }
-        
-        // Final fallback: API testing with header
+
+        // Final fallback: API testing header
         if (!$userRole) {
             $userRole = $request->header('X-User-Role');
         }
 
-        // 2. Reject if no role context is provided
+        // Reject if no role context
         if (!$userRole) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized. Missing authentication context.'
-            ], 401);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized. Missing authentication context.'
+                ], 401);
+            }
+            // Redirect web requests to appropriate login page
+            if (in_array('admin', $roles)) {
+                return redirect()->route('admin.login');
+            }
+            return redirect()->route('client.login');
         }
 
-        // 3. Compare user role against the route's allowed roles array
+        // Compare user role against the route's allowed roles
         if (!in_array($userRole, $roles)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Forbidden. You do not have the required permissions to access this resource.'
-            ], 403);
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Forbidden. You do not have the required permissions.'
+                ], 403);
+            }
+            abort(403, 'Forbidden. You do not have the required permissions.');
         }
 
         return $next($request);

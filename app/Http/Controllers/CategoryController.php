@@ -10,50 +10,82 @@ class CategoryController extends Controller
 {
     /**
      * Display unique categories or filter products inside a selected category.
+     * Only public products are shown to clients.
      */
     public function index(Request $request)
-{
-    $selectedCategory = $request->query('category');
-    
-    $allProducts = Product::all();
-    
-    // Explicitly parse and normalize unique categories to raw strings
-    $categories = $allProducts->map(function ($prod) {
-        $cat = isset($prod->metadata['category']) ? $prod->metadata['category'] : 'General';
-        
-        // If the category field itself is nested as an array, extract the first value or string representation
-        if (is_array($cat)) {
-            return isset($cat['name']) ? (string)$cat['name'] : (string)reset($cat);
-        }
-        
-        return (string)$cat;
-    })->unique()->filter()->values(); // Added values() to reset collection keys cleanly
+    {
+        $selectedCategory = $request->query('category');
 
-    $products = collect();
-    if (!empty($selectedCategory)) {
-        $products = Product::where('metadata.category', $selectedCategory)
-            ->orWhere('category', $selectedCategory) // Also fall back to root category field if present
-            ->paginate(9);
+        // Only public products visible to clients
+        $allProducts = Product::where(function ($q) {
+            $q->where('visibility_status', 'public')
+              ->orWhere(function ($q2) {
+                  $q2->whereNull('visibility_status')->where('is_public', true);
+              });
+        })->get();
+
+        // Extract unique categories from the root 'category' field
+        $categories = $allProducts->map(function ($prod) {
+            $cat = $prod->category;
+
+            // Fallback: check metadata.category if root category is empty
+            if (empty($cat) && isset($prod->metadata['category'])) {
+                $cat = $prod->metadata['category'];
+            }
+
+            if (empty($cat)) {
+                $cat = 'General';
+            }
+
+            if (is_array($cat)) {
+                return isset($cat['name']) ? (string) $cat['name'] : (string) reset($cat);
+            }
+
+            return (string) $cat;
+        })->unique()->filter()->values();
+
+        $products = collect();
+        if (!empty($selectedCategory)) {
+            $products = Product::where(function ($q) {
+                    $q->where('visibility_status', 'public')
+                      ->orWhere(function ($q2) {
+                          $q2->whereNull('visibility_status')->where('is_public', true);
+                      });
+                })
+                ->where(function ($q) use ($selectedCategory) {
+                    $q->where('category', $selectedCategory)
+                      ->orWhere('metadata.category', $selectedCategory);
+                })
+                ->paginate(9);
+        }
+
+        return view('client.client_categories', [
+            'categories' => $categories,
+            'products' => $products,
+            'selectedCategory' => $selectedCategory,
+        ]);
     }
 
-    return view('client.client_categories', [
-        'categories' => $categories,
-        'products' => $products,
-        'selectedCategory' => $selectedCategory
-    ]);
-}
+    /**
+     * Show a single product with its pharmacy information.
+     * GUARD: Private products return 404.
+     */
     public function show($id)
     {
-        // 1. Find the product by its MongoDB ID
         $product = Product::findOrFail($id);
 
-        // 2. Find the associated pharmacy using the relationship key
-        // Matches the "pharm_6a35bd9..." style string format in your documents
-        $pharmacy = Pharmacy::where('pharmacy_id', $product->pharmacy_id)->first();
+        // Visibility guard — private products not accessible to clients
+        $visibility = $product->visibility_status ?? ($product->is_public ? 'public' : 'private');
+        if ($visibility !== 'public') {
+            abort(404, 'Product not found.');
+        }
+
+        // Find the pharmacy using the product's pharmacy_id as the Pharmacy _id
+        $pharmacy = Pharmacy::find($product->pharmacy_id);
 
         return view('client.client_product_view', [
             'product' => $product,
-            'pharmacy' => $pharmacy
+            'pharmacy' => $pharmacy,
         ]);
     }
 }

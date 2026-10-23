@@ -13,9 +13,15 @@
 </head>
 <body class="bg-pharmacy-50 min-h-screen flex items-center justify-center font-sans antialiased">
 <div class="w-full max-w-sm p-4">
-    <div class="bg-white px-8 py-10 rounded-2xl shadow-xl border border-emerald-500/10 text-center">
+    <div class="bg-white px-6 sm:px-8 py-8 sm:py-10 rounded-2xl shadow-xl border border-emerald-500/10 text-center">
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight mb-1">Verify Your Email</h1>
         <p class="text-sm text-slate-500 mb-6">We sent a 6-digit code to your email address.</p>
+
+        @if(session('status'))
+            <div class="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl text-left">
+                {{ session('status') }}
+            </div>
+        @endif
 
         @if($errors->any())
             <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-semibold rounded-xl text-left">
@@ -23,10 +29,15 @@
             </div>
         @endif
 
+        @php
+            $email = session('verification_email') ?? session('email') ?? old('email') ?? request('email') ?? '';
+        @endphp
+
         <form action="{{ route('client.verify.submit') }}" method="POST" class="space-y-4">
             @csrf
-            
-            <input type="hidden" name="email" value="{{ request('email') }}">
+
+            {{-- FIX: Read email from session flash, not request() query param --}}
+            <input type="hidden" name="email" value="{{ $email }}">
 
             <div class="text-left">
                 <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5 text-center">Verification Code</label>
@@ -38,6 +49,22 @@
                 Confirm & Create Account
             </button>
         </form>
+
+        {{-- Resend Code --}}
+        <div class="mt-4 pt-4 border-t border-slate-100">
+            <p class="text-xs text-slate-400 mb-2">Didn't receive the code?</p>
+            <form action="{{ route('client.verify.resend') }}" method="POST">
+                @csrf
+                <input type="hidden" name="email" value="{{ $email }}">
+                <button type="submit" class="text-sm font-semibold text-pharmacy-600 hover:text-pharmacy-700 hover:underline transition">
+                    Resend Verification Code
+                </button>
+            </form>
+        </div>
+
+        @if(!empty($email))
+            <p class="text-xs text-slate-400 mt-3">Sending to: <strong class="text-slate-600">{{ $email }}</strong></p>
+        @endif
     </div>
 </div>
 </body>

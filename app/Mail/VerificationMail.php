@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Queue\SerializesModels;
+
+class VerificationMail extends Mailable
+{
+    use Queueable, SerializesModels;
+
+    public int $otpCode;
+    public string $userName;
+
+    /**
+     * Create a new message instance.
+     */
+    public function __construct(int $otpCode, string $userName)
+    {
+        $this->otpCode = $otpCode;
+        $this->userName = $userName;
+    }
+
+    /**
+     * Get the message envelope.
+     */
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'PharmaPortal — Email Verification Code',
+        );
+    }
+
+    /**
+     * Get the message content definition.
+     */
+    public function content(): Content
+    {
+        return new Content(
+            view: 'emails.verification',
+        );
+    }
+}

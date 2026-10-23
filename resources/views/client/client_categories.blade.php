@@ -28,7 +28,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <a href="/client-dashboard" class="flex items-center space-x-2 text-xl font-bold text-slate-800">
-                    <span>💚</span> <span>PharmaPortal</span>
+                    <img src="{{ asset('images/pharmaportal.png') }}" alt="PharmaPortal Logo" class="h-8 w-8 object-contain"> <span>PharmaPortal</span>
                 </a>
                 <a href="/client-dashboard" class="text-sm font-bold text-slate-500 hover:text-slate-700 transition">
                     ← Back to Dashboard
@@ -51,7 +51,7 @@
                        class="bg-white border border-slate-200 rounded-2xl p-6 hover:border-pharmacy-600 hover:shadow-md transition text-left group flex flex-col justify-between h-36">
                         <div>
                             <div class="w-10 h-10 bg-pharmacy-50 text-pharmacy-600 rounded-xl flex items-center justify-center text-lg mb-3 font-bold group-hover:bg-pharmacy-600 group-hover:text-white transition">
-                                💊
+                                <svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M10.5 20.5l-6-6a4.95 4.95 0 1 1 7-7l6 6a4.95 4.95 0 1 1-7 7z"></path><line x1="8.5" y1="8.5" x2="15.5" y2="15.5"></line></svg>
                             </div>
                             <h3 class="text-base font-bold text-slate-800 group-hover:text-pharmacy-700 transition truncate">{{ $cat }}</h3>
                         </div>
@@ -63,19 +63,19 @@
             </div>
 
         @else
-            <div class="mb-8 flex items-center justify-between border-b border-slate-200 pb-4">
+            <div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 pb-4 gap-4 sm:gap-0">
                 <div>
                     <span class="text-xs font-bold text-pharmacy-600 uppercase tracking-wider">Category Catalog</span>
-                    <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight mt-0.5">{{ $selectedCategory }}</h1>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight mt-0.5">{{ $selectedCategory }}</h1>
                 </div>
-                <a href="/client-categories" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl text-xs transition">
+                <a href="/client-categories" class="inline-block px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold rounded-xl text-xs transition self-start sm:self-auto">
                     View All Categories
                 </a>
             </div>
 
             @if($products->isEmpty())
                 <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-slate-200 p-8">
-                    <div class="text-4xl mb-3">📦</div>
+                    <div class="text-4xl mb-3"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
                     <h3 class="text-lg font-bold text-slate-800">No Products Found</h3>
                     <p class="text-sm text-slate-400 mt-1">There are currently no medications mapped under the category "{{ $selectedCategory }}".</p>
                 </div>
@@ -101,9 +101,9 @@
                             <div>
                                 <div class="mb-4 p-3 bg-slate-50 rounded-xl">
                                     <div class="text-xl font-black text-pharmacy-600">{{ $product->price }} DA</div>
-                                    <div class="text-xs text-slate-500 mt-1">Stock Availability: 
-                                        <span class="{{ $product->stock > 0 ? 'font-bold text-slate-700' : 'font-bold text-red-500' }}">
-                                            {{ $product->stock > 0 ? $product->stock . ' units' : 'Out of Stock' }}
+                                    <div class="text-xs text-slate-500 mt-1">Status: 
+                                        <span class="{{ $product->stock > 0 ? 'font-bold text-emerald-600' : 'font-bold text-red-500' }}">
+                                            {{ $product->stock > 0 ? 'Available' : 'Out of Stock' }}
                                         </span>
                                     </div>
                                 </div>

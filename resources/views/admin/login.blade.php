@@ -9,7 +9,7 @@
 <body class="bg-slate-900 min-h-screen flex items-center justify-center p-4 font-sans">
     <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
         <div class="text-center mb-8">
-            <span class="text-4xl block mb-2">🛡️</span>
+            <span class="text-4xl block mb-2">🛡</span>
             <h1 class="text-2xl font-black text-slate-800 tracking-tight">System Core Admin</h1>
             <p class="text-xs text-slate-400 mt-1">Isolated administrative database terminal access portal</p>
         </div>

@@ -20,10 +20,10 @@
 <body class="bg-pharmacy-50 min-h-screen flex items-center justify-center font-sans antialiased">
 
 <div class="w-full max-w-sm p-4">
-    <div class="bg-white px-8 py-10 rounded-2xl shadow-xl shadow-emerald-950/5 border border-emerald-500/10 text-center">
+    <div class="bg-white px-6 sm:px-8 py-8 sm:py-10 rounded-2xl shadow-xl shadow-emerald-950/5 border border-emerald-500/10 text-center">
         
         <a href="/client-dashboard" class="w-16 h-16 bg-pharmacy-600 text-white rounded-2xl flex items-center justify-center text-3xl font-bold mx-auto mb-5 shadow-lg shadow-emerald-600/20 block select-none">
-            💚
+            <img src="{{ asset('images/pharmaportal.png') }}" alt="PharmaPortal Logo" class="h-8 w-8 object-contain">
         </a>
         
         <h1 class="text-2xl font-bold text-slate-800 tracking-tight mb-1">Welcome Back</h1>

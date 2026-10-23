@@ -17,7 +17,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16 items-center">
                 <a href="/client-dashboard" class="flex items-center space-x-2 text-xl font-bold text-slate-800">
-                    <span>💚</span> <span>PharmaPortal</span>
+                    <img src="{{ asset('images/pharmaportal.png') }}" alt="PharmaPortal Logo" class="h-8 w-8 object-contain"> <span>PharmaPortal</span>
                 </a>
                 <a href="/client-dashboard" class="text-sm font-bold text-slate-500 hover:text-slate-700">Back Dashboard</a>
             </div>
@@ -37,7 +37,7 @@
             </div>
 
             <form class="space-y-4">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nom</label>
                         <input type="text" value="{{ Auth::user()->nom }}" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:outline-none">
@@ -58,7 +58,7 @@
                     <input type="tel" value="{{ Auth::user()->num_tel }}" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:outline-none">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Wilaya</label>
                         <input type="text" value="{{ Auth::user()->wilaya }}" class="w-full px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:outline-none">

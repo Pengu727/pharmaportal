@@ -19,10 +19,31 @@ class User extends Authenticatable {
         'date_naissance', 
         'role', 
         'is_verified', 
-        'role_profile'
+        'role_profile',
+        'pharmacy_id',
+    ];
+    protected $hidden = [
+        'password',
     ];
     protected $casts = [
         'date_naissance' => 'date', 
         'is_verified' => 'boolean', 
-        'role_profile' => 'array'];
+        'role_profile' => 'array',
+    ];
+
+    /**
+     * Get the pharmacy this user belongs to (owner or seller).
+     */
+    public function pharmacy()
+    {
+        return $this->belongsTo(Pharmacy::class, 'pharmacy_id');
+    }
+
+    /**
+     * Get reservations made by this user (client).
+     */
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'user_id');
+    }
 }
